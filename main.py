@@ -1,7 +1,8 @@
 from fastmcp import FastMCP
 import os
-import sqlite3
+import asyncio
 import traceback
+import aiosqlite
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "expenses.db")
 CATEGORIES_PATH = os.path.join(os.path.dirname(__file__), "categories.json")
@@ -9,9 +10,9 @@ CATEGORIES_PATH = os.path.join(os.path.dirname(__file__), "categories.json")
 mcp = FastMCP("ExpenseTracker")
 
 
-def init_db():
-    with sqlite3.connect(DB_PATH) as c:
-        c.execute("""
+async def init_db():
+    async with aiosqlite.connect(DB_PATH) as db:
+        await db.execute("""
         CREATE TABLE IF NOT EXISTS expenses(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             date TEXT NOT NULL,
@@ -21,20 +22,17 @@ def init_db():
             note TEXT DEFAULT ''
         )
         """)
-        c.commit()
-
-
-init_db()
+        await db.commit()
 
 
 @mcp.tool
-def add_expense(date, amount, category, subcategory="", note=""):
+async def add_expense(date, amount, category, subcategory="", note=""):
     """
     Add a new expense entry to the database.
     """
     try:
-        with sqlite3.connect(DB_PATH) as c:
-            cur = c.execute(
+        async with aiosqlite.connect(DB_PATH) as db:
+            cur = await db.execute(
                 """
                 INSERT INTO expenses(date, amount, category, subcategory, note)
                 VALUES (?, ?, ?, ?, ?)
@@ -42,7 +40,7 @@ def add_expense(date, amount, category, subcategory="", note=""):
                 (date, amount, category, subcategory, note),
             )
 
-            c.commit()
+            await db.commit()
 
             return {
                 "status": "ok",
@@ -59,12 +57,12 @@ def add_expense(date, amount, category, subcategory="", note=""):
 
 
 @mcp.tool
-def list_expenses(start_date, end_date):
+async def list_expenses(start_date, end_date):
     """
     List all expense entries within an inclusive date range.
     """
-    with sqlite3.connect(DB_PATH) as c:
-        cur = c.execute(
+    async with aiosqlite.connect(DB_PATH) as db:
+        cur = await db.execute(
             """
             SELECT
                 id,
@@ -80,24 +78,25 @@ def list_expenses(start_date, end_date):
             (start_date, end_date),
         )
 
+        rows = await cur.fetchall()
         cols = [d[0] for d in cur.description]
 
         return [
             dict(zip(cols, row))
-            for row in cur.fetchall()
+            for row in rows
         ]
 
 
 @mcp.tool
-def summarize_expenses(start_date, end_date):
+async def summarize_expenses(start_date, end_date):
     """
     Summarize expenses within an inclusive date range.
     Returns total spending, transaction count,
     and category-wise totals.
     """
-    with sqlite3.connect(DB_PATH) as c:
+    async with aiosqlite.connect(DB_PATH) as db:
 
-        cur = c.execute(
+        cur = await db.execute(
             """
             SELECT
                 COUNT(*) AS total_transactions,
@@ -108,9 +107,9 @@ def summarize_expenses(start_date, end_date):
             (start_date, end_date),
         )
 
-        total_transactions, total_spent = cur.fetchone()
+        total_transactions, total_spent = await cur.fetchone()
 
-        cur = c.execute(
+        cur = await db.execute(
             """
             SELECT
                 category,
@@ -124,13 +123,15 @@ def summarize_expenses(start_date, end_date):
             (start_date, end_date),
         )
 
+        rows = await cur.fetchall()
+
         categories = [
             {
                 "category": row[0],
                 "transactions": row[1],
                 "total": row[2],
             }
-            for row in cur.fetchall()
+            for row in rows
         ]
 
     return {
@@ -143,7 +144,7 @@ def summarize_expenses(start_date, end_date):
 
 
 @mcp.tool
-def debug_db():
+async def debug_db():
     """
     Debug database permissions and location.
     """
@@ -159,12 +160,14 @@ def debug_db():
 
 
 @mcp.resource("expense://categories", mime_type="application/json")
-def categories():
+async def categories():
     with open(CATEGORIES_PATH, "r", encoding="utf-8") as f:
         return f.read()
 
 
 if __name__ == "__main__":
+    asyncio.run(init_db())
+
     mcp.run(
         transport="http",
         host="0.0.0.0",
