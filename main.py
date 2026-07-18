@@ -4,13 +4,19 @@ import asyncio
 import traceback
 import aiosqlite
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "expenses.db")
+# Use a writable directory at runtime instead of the app's install directory,
+# which is often read-only in containerized/serverless deployments.
+# You can override this via an environment variable if your platform
+# provides a specific writable/persistent volume path.
+DB_DIR = os.environ.get("DATA_DIR", "/tmp")
+DB_PATH = os.path.join(DB_DIR, "expenses.db")
 CATEGORIES_PATH = os.path.join(os.path.dirname(__file__), "categories.json")
 
 mcp = FastMCP("ExpenseTracker")
 
 
 async def init_db():
+    os.makedirs(DB_DIR, exist_ok=True)
     async with aiosqlite.connect(DB_PATH) as db:
         await db.execute("""
         CREATE TABLE IF NOT EXISTS expenses(
@@ -151,11 +157,11 @@ async def debug_db():
     return {
         "db_path": DB_PATH,
         "db_exists": os.path.exists(DB_PATH),
-        "db_readable": os.access(DB_PATH, os.R_OK),
-        "db_writable": os.access(DB_PATH, os.W_OK),
-        "directory": os.path.dirname(DB_PATH),
-        "directory_exists": os.path.exists(os.path.dirname(DB_PATH)),
-        "directory_writable": os.access(os.path.dirname(DB_PATH), os.W_OK),
+        "db_readable": os.access(DB_PATH, os.R_OK) if os.path.exists(DB_PATH) else None,
+        "db_writable": os.access(DB_PATH, os.W_OK) if os.path.exists(DB_PATH) else None,
+        "directory": DB_DIR,
+        "directory_exists": os.path.exists(DB_DIR),
+        "directory_writable": os.access(DB_DIR, os.W_OK),
     }
 
 
