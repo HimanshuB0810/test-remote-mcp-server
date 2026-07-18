@@ -1,0 +1,156 @@
+{
+  "food": [
+    "groceries",
+    "fruits_vegetables",
+    "dairy_bakery",
+    "meat_seafood",
+    "snacks",
+    "beverages",
+    "dining_out",
+    "fast_food",
+    "coffee_tea",
+    "desserts"
+  ],
+
+  "transport": [
+    "fuel",
+    "public_transport",
+    "cab_taxi",
+    "auto_rickshaw",
+    "metro",
+    "train",
+    "bus",
+    "flight",
+    "parking",
+    "tolls",
+    "vehicle_maintenance",
+    "vehicle_insurance"
+  ],
+
+  "shopping": [
+    "clothing",
+    "footwear",
+    "accessories",
+    "electronics",
+    "gadgets",
+    "books",
+    "stationery",
+    "home_decor",
+    "furniture",
+    "gifts"
+  ],
+
+  "bills": [
+    "electricity",
+    "water",
+    "gas",
+    "internet",
+    "mobile_recharge",
+    "telephone",
+    "rent",
+    "maintenance",
+    "subscription"
+  ],
+
+  "health": [
+    "doctor",
+    "medicine",
+    "hospital",
+    "medical_tests",
+    "health_insurance",
+    "gym",
+    "fitness",
+    "mental_health"
+  ],
+
+  "education": [
+    "tuition",
+    "college_fees",
+    "books",
+    "online_courses",
+    "certifications",
+    "exam_fees",
+    "software",
+    "workshops"
+  ],
+
+  "entertainment": [
+    "movies",
+    "streaming",
+    "gaming",
+    "music",
+    "events",
+    "sports",
+    "hobbies"
+  ],
+
+  "travel": [
+    "hotel",
+    "food",
+    "transport",
+    "sightseeing",
+    "shopping",
+    "visa",
+    "travel_insurance"
+  ],
+
+  "personal_care": [
+    "haircut",
+    "salon",
+    "cosmetics",
+    "skincare",
+    "toiletries",
+    "spa"
+  ],
+
+  "family": [
+    "parents",
+    "children",
+    "spouse",
+    "pets",
+    "gifts",
+    "celebrations"
+  ],
+
+  "finance": [
+    "investment",
+    "mutual_funds",
+    "stocks",
+    "fixed_deposit",
+    "loan_payment",
+    "credit_card",
+    "bank_charges",
+    "tax"
+  ],
+
+  "business": [
+    "office_supplies",
+    "software",
+    "hosting",
+    "domain",
+    "advertising",
+    "client_meeting",
+    "travel",
+    "equipment"
+  ],
+
+  "utilities": [
+    "cleaning",
+    "laundry",
+    "repairs",
+    "security",
+    "garden"
+  ],
+
+  "charity": [
+    "donation",
+    "religious",
+    "fundraising"
+  ],
+
+  "miscellaneous": [
+    "cash_withdrawal",
+    "emergency",
+    "others"
+  ]
+}
